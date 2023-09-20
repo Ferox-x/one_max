@@ -5,8 +5,8 @@ from pathlib import Path
 
 class GraphsCreator:
     def __init__(self):
-        self.data_frame = pd.read_csv("../frames/constants.csv")
-        self._output_folder = Path("../plots")
+        self.data_frame = pd.read_csv("./frames/constants.csv")
+        self._output_folder = Path("./plots")
         self.plot_params = [
             (
                 "GENS_SIZE",
