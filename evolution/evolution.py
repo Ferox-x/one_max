@@ -12,6 +12,13 @@ class PopulationConstants:
     P_CROSSOVER: float
     P_MUTATION: float
     MAX_GENERATIONS: int
+    TOURNAMENT_SIZE: int
+    SELECTION_TYPE: int
+    CROSSING_TYPE: int
+    EQUAL_SELECTION_CHANCE: float
+    MUTATION_POWER: int
+    HIGH_MUTATION_POWER: int
+    LOW_MUTATION_POWER: int
 
 
 class EvolutionaryOptimizer:
@@ -19,11 +26,18 @@ class EvolutionaryOptimizer:
     def randomize_constants(cls):
         _constants = PopulationConstants(
             ONE_MAX=100,
-            GENS_SIZE=random.randint(50, 150),
+            GENS_SIZE=random.randint(100, 150),
             POPULATION_SIZE=random.randint(50, 150),
             P_CROSSOVER=random.random(),
             P_MUTATION=random.random(),
             MAX_GENERATIONS=random.randint(50, 150),
+            TOURNAMENT_SIZE=random.randint(2, 4),
+            SELECTION_TYPE=random.randint(1, 2),
+            CROSSING_TYPE=random.randint(1, 3),
+            EQUAL_SELECTION_CHANCE=0.25,
+            MUTATION_POWER=random.randint(1, 3),
+            HIGH_MUTATION_POWER=random.randint(3, 5),
+            LOW_MUTATION_POWER=random.randint(3, 5),
         )
         return _constants
 
@@ -42,7 +56,7 @@ class EvolutionaryOptimizer:
             and generation_counter < consts.MAX_GENERATIONS
         ):
             generation_counter += 1
-            offspring = population.tournament()
+            offspring = population.selection()
 
             offspring.crossing()
             offspring.mutation()

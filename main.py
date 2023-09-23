@@ -5,6 +5,7 @@ from evolution import EvolutionaryOptimizer
 from graphs import create_graphs
 
 
+
 def job(index):
     constants = EvolutionaryOptimizer.randomize_constants()
     data_frame = pd.DataFrame()
