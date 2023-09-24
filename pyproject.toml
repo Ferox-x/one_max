@@ -1,5 +1,5 @@
 [tool.poetry]
-name = ",machine-learning"
+name = "machine-learning"
 version = "0.1.0"
 description = ""
 authors = ["ferox <malov.egor.alexandrovich@gmail.com >"]
@@ -10,6 +10,7 @@ python = "^3.11"
 matplotlib = "^3.8.0"
 black = "^23.9.1"
 pandas = "^2.1.0"
+tqdm = "^4.66.1"
 
 
 [build-system]
