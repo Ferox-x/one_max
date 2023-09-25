@@ -11,7 +11,7 @@ def main():
     pool = multiprocessing.Pool(processes=num_processes)
 
     data_frames = list(
-        tqdm(pool.imap_unordered(job, range(50)), total=50, desc="Processing")
+        tqdm(pool.imap_unordered(job, range(100)), total=100, desc="Processing")
     )
 
     pool.close()
