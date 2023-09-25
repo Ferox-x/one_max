@@ -1,3 +1,5 @@
+import numpy as np
+
 from individual import Individual
 
 from . import mixins
@@ -8,7 +10,6 @@ class Population(
     mixins.CrossingMixin,
     mixins.MutationMixin,
 ):
-
     @classmethod
     def create_population(cls, constants):
         population = cls(constants)
@@ -18,7 +19,7 @@ class Population(
         return population
 
     def get_fitness_values(self):
-        return [ind.fitness for ind in self]
+        return np.array([ind.fitness for ind in self])
 
     def _create_population_with_constants(self):
         return Population(self.constants)

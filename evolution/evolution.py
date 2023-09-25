@@ -2,6 +2,7 @@ import random
 
 from population import Population
 from dataclasses import dataclass
+from population import mixins as population_mixins
 
 
 @dataclass
@@ -24,22 +25,31 @@ class PopulationConstants:
 class EvolutionaryOptimizer:
     @classmethod
     def randomize_constants(cls):
-        _constants = PopulationConstants(
+        SELECTION_TYPE = random.randint(
+            1, len(population_mixins.SelectionMixin.SelectionTypeChoice)
+        )
+        CROSSING_TYPE = random.randint(
+            1, len(population_mixins.CrossingMixin.CrossingTypeChoice)
+        )
+        MUTATION_POWER = random.randint(
+            1, len(population_mixins.MutationMixin.PowerOfMutationChoices)
+        )
+
+        return PopulationConstants(
             ONE_MAX=100,
-            GENS_SIZE=random.randint(100, 150),
+            GENS_SIZE=100,
             POPULATION_SIZE=random.randint(100, 150),
             P_CROSSOVER=random.random(),
             P_MUTATION=random.random(),
             MAX_GENERATIONS=random.randint(50, 150),
             TOURNAMENT_SIZE=random.randint(2, 4),
-            SELECTION_TYPE=random.randint(1, 4),
-            CROSSING_TYPE=random.randint(1, 3),
+            SELECTION_TYPE=SELECTION_TYPE,
+            CROSSING_TYPE=CROSSING_TYPE,
+            MUTATION_POWER=MUTATION_POWER,
             EQUAL_SELECTION_CHANCE=0.25,
-            MUTATION_POWER=random.randint(1, 3),
             HIGH_MUTATION_POWER=random.randint(3, 5),
             LOW_MUTATION_POWER=random.randint(3, 5),
         )
-        return _constants
 
     @classmethod
     def evolve(cls, consts):
@@ -63,8 +73,8 @@ class EvolutionaryOptimizer:
 
             population[:] = offspring
             fitness_values = population.get_fitness_values()
-            max_fitness = max(fitness_values)
-            mean_fitness = sum(fitness_values) / len(population)
+            max_fitness = fitness_values.max()
+            mean_fitness = fitness_values.sum() / len(population)
             max_fitness_values.append(max_fitness)
             mean_fitness_values.append(mean_fitness)
 
