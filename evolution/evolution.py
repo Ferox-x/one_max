@@ -1,4 +1,4 @@
-import random
+import numpy as np
 
 from dataclasses import dataclass
 from population import Population
@@ -26,30 +26,46 @@ class PopulationConstants:
 class EvolutionaryOptimizer:
     @classmethod
     def randomize_constants(cls):
-        SELECTION_TYPE = ENV_CONSTANTS.get("SELECTION_TYPE") or random.randint(
-            1, len(population_mixins.SelectionMixin.SelectionTypeChoice)
-        )
-        CROSSING_TYPE = ENV_CONSTANTS.get("CROSSING_TYPE") or random.randint(
-            1, len(population_mixins.CrossingMixin.CrossingTypeChoice)
-        )
-        MUTATION_POWER = ENV_CONSTANTS.get("MUTATION_POWER") or random.randint(
-            1, len(population_mixins.MutationMixin.PowerOfMutationChoices)
-        )
+        if bool(int(ENV_CONSTANTS.get('RANDOM'))):
+            SELECTION_TYPE = ENV_CONSTANTS.get("SELECTION_TYPE") or np.random.randint(
+                1, len(population_mixins.SelectionMixin.SelectionTypeChoice)
+            )
+            CROSSING_TYPE = ENV_CONSTANTS.get("CROSSING_TYPE") or np.random.randint(
+                1, len(population_mixins.CrossingMixin.CrossingTypeChoice)
+            )
+            MUTATION_POWER = ENV_CONSTANTS.get("MUTATION_POWER") or np.random.randint(
+                1, len(population_mixins.MutationMixin.PowerOfMutationChoices)
+            )
+            return PopulationConstants(
+                ONE_MAX=100,
+                GENS_SIZE=100,
+                POPULATION_SIZE=np.random.randint(100, 150),
+                P_CROSSOVER=np.random.random(),
+                P_MUTATION=np.random.random(),
+                MAX_GENERATIONS=np.random.randint(50, 150),
+                TOURNAMENT_SIZE=np.random.randint(2, 4),
+                SELECTION_TYPE=SELECTION_TYPE,
+                CROSSING_TYPE=CROSSING_TYPE,
+                MUTATION_POWER=MUTATION_POWER,
+                EQUAL_SELECTION_CHANCE=0.25,
+                HIGH_MUTATION_POWER=np.random.randint(3, 5),
+                LOW_MUTATION_POWER=np.random.randint(3, 5),
+            )
 
         return PopulationConstants(
-            ONE_MAX=int(ENV_CONSTANTS.get("ONE_MAX")) or 100,
-            GENS_SIZE=int(ENV_CONSTANTS.get("GENS_SIZE")) or 100,
-            POPULATION_SIZE=int(ENV_CONSTANTS.get("POPULATION_SIZE")) or random.randint(100, 150),
-            P_CROSSOVER=float(ENV_CONSTANTS.get("P_CROSSOVER")) or random.random(),
-            P_MUTATION=float(ENV_CONSTANTS.get("P_MUTATION")) or random.random(),
-            MAX_GENERATIONS=int(ENV_CONSTANTS.get("MAX_GENERATIONS")) or random.randint(50, 150),
-            TOURNAMENT_SIZE=int(ENV_CONSTANTS.get("TOURNAMENT_SIZE")) or random.randint(2, 4),
-            SELECTION_TYPE=int(ENV_CONSTANTS.get("SELECTION_TYPE")) or SELECTION_TYPE,
-            CROSSING_TYPE=int(ENV_CONSTANTS.get("CROSSING_TYPE")) or CROSSING_TYPE,
-            MUTATION_POWER=int(ENV_CONSTANTS.get("MUTATION_POWER")) or MUTATION_POWER,
-            EQUAL_SELECTION_CHANCE=float(ENV_CONSTANTS.get("EQUAL_SELECTION_CHANCE")) or 0.25,
-            HIGH_MUTATION_POWER=int(ENV_CONSTANTS.get("HIGH_MUTATION_POWER")) or random.randint(3, 5),
-            LOW_MUTATION_POWER=int(ENV_CONSTANTS.get("LOW_MUTATION_POWER")) or random.randint(3, 5),
+            ONE_MAX=int(ENV_CONSTANTS.get("ONE_MAX")),
+            GENS_SIZE=int(ENV_CONSTANTS.get("GENS_SIZE")),
+            POPULATION_SIZE=int(ENV_CONSTANTS.get("POPULATION_SIZE")),
+            P_CROSSOVER=float(ENV_CONSTANTS.get("P_CROSSOVER")),
+            P_MUTATION=float(ENV_CONSTANTS.get("P_MUTATION")),
+            MAX_GENERATIONS=int(ENV_CONSTANTS.get("MAX_GENERATIONS")),
+            TOURNAMENT_SIZE=int(ENV_CONSTANTS.get("TOURNAMENT_SIZE")),
+            SELECTION_TYPE=int(ENV_CONSTANTS.get("SELECTION_TYPE")),
+            CROSSING_TYPE=int(ENV_CONSTANTS.get("CROSSING_TYPE")),
+            MUTATION_POWER=int(ENV_CONSTANTS.get("MUTATION_POWER")),
+            EQUAL_SELECTION_CHANCE=float(ENV_CONSTANTS.get("EQUAL_SELECTION_CHANCE")),
+            HIGH_MUTATION_POWER=int(ENV_CONSTANTS.get("HIGH_MUTATION_POWER")),
+            LOW_MUTATION_POWER=int(ENV_CONSTANTS.get("LOW_MUTATION_POWER")),
         )
 
     @classmethod
