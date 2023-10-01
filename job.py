@@ -17,6 +17,7 @@ def job(index):
             max_fitness_values,
             mean_fitness_values,
             generation,
+            best_individual_fitness,
         ) = EvolutionaryOptimizer.evolve(consts=constants)
         constants_data = {
             "ONE_MAX": constants.ONE_MAX,
@@ -33,10 +34,13 @@ def job(index):
             "HIGH_MUTATION_POWER": constants.HIGH_MUTATION_POWER,
             "LOW_MUTATION_POWER": constants.LOW_MUTATION_POWER,
         }
+        if best_individual_fitness < 100 and generation == constants.MAX_GENERATIONS:
+            generation = pd.NA
         results = {
-            "generation": generation,
-            "max_fitness_values": str(max_fitness_values),
-            "mean_fitness_values": str(mean_fitness_values),
+            "BEST_FITNESS": best_individual_fitness,
+            "GENERATION": generation,
+            "MAX_FITNESS_VALUES": str(max_fitness_values),
+            "MEAN_FITNESS_VALUES": str(mean_fitness_values),
         }
         population_frame = pd.DataFrame({**constants_data, **results}, index=[0])
         data_frame = pd.concat([data_frame, population_frame])

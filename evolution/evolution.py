@@ -27,15 +27,9 @@ class EvolutionaryOptimizer:
     @classmethod
     def randomize_constants(cls):
         if bool(int(ENV_CONSTANTS.get('RANDOM'))):
-            SELECTION_TYPE = ENV_CONSTANTS.get("SELECTION_TYPE") or np.random.randint(
-                1, len(population_mixins.SelectionMixin.SelectionTypeChoice)
-            )
-            CROSSING_TYPE = ENV_CONSTANTS.get("CROSSING_TYPE") or np.random.randint(
-                1, len(population_mixins.CrossingMixin.CrossingTypeChoice)
-            )
-            MUTATION_POWER = ENV_CONSTANTS.get("MUTATION_POWER") or np.random.randint(
-                1, len(population_mixins.MutationMixin.PowerOfMutationChoices)
-            )
+            SELECTION_TYPE = np.random.randint(1, len(population_mixins.SelectionMixin.SelectionTypeChoice))
+            CROSSING_TYPE = np.random.randint(1, len(population_mixins.CrossingMixin.CrossingTypeChoice))
+            MUTATION_POWER = np.random.randint(1, len(population_mixins.MutationMixin.PowerOfMutationChoices))
             return PopulationConstants(
                 ONE_MAX=100,
                 GENS_SIZE=100,
@@ -76,6 +70,7 @@ class EvolutionaryOptimizer:
         fitness_values = population.get_fitness_values()
         generation_counter = 0
 
+        max_fitness = 0
         max_fitness_values = list()
         mean_fitness_values = list()
         while max(fitness_values) < consts.ONE_MAX and generation_counter < consts.MAX_GENERATIONS:
@@ -91,4 +86,4 @@ class EvolutionaryOptimizer:
             mean_fitness = fitness_values.sum() / len(population)
             max_fitness_values.append(max_fitness)
             mean_fitness_values.append(mean_fitness)
-        return max_fitness_values, mean_fitness_values, generation_counter
+        return max_fitness_values, mean_fitness_values, generation_counter, max_fitness
