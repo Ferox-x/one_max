@@ -4,9 +4,7 @@ import numpy as np
 class Individual:
     def __init__(self, constants):
         self.constants = constants
-        self.gens = np.random.randint(
-            0, 2, size=self.constants.GENS_SIZE, dtype=np.int32
-        )
+        self.gens = np.random.randint(0, 2, size=self.constants.GENS_SIZE, dtype=np.int32)
 
     @property
     def fitness(self):

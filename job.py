@@ -1,12 +1,18 @@
-from evolution import EvolutionaryOptimizer
 import pandas as pd
+import numpy as np
+
+from evolution import EvolutionaryOptimizer
+
+from utils.data_service import DataSaver
+from utils import ENV_CONSTANTS
 
 
 def job(index):
+    np.random.seed()
     constants = EvolutionaryOptimizer.randomize_constants()
     data_frame = pd.DataFrame()
 
-    for _ in range(100):  # Цикл для генерации новых генов
+    for _ in range(int(ENV_CONSTANTS.get("TOTAL_GENERATIONS", 1))):  # Цикл для генерации новых генов
         (
             max_fitness_values,
             mean_fitness_values,
@@ -34,5 +40,7 @@ def job(index):
         }
         population_frame = pd.DataFrame({**constants_data, **results}, index=[0])
         data_frame = pd.concat([data_frame, population_frame])
-
-    return data_frame
+    DataSaver.save_data_frame(
+        data_frame=data_frame,
+        index=index,
+    )

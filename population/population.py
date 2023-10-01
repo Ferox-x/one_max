@@ -12,10 +12,8 @@ class Population(
 ):
     @classmethod
     def create_population(cls, constants):
-        population = cls(constants)
-        population.extend(
-            [Individual(constants) for _ in range(constants.POPULATION_SIZE)]
-        )
+        population = Population(constants)
+        population.extend([Individual(constants) for _ in range(constants.POPULATION_SIZE)])
         return population
 
     def get_fitness_values(self):

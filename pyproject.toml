@@ -11,8 +11,14 @@ matplotlib = "^3.8.0"
 black = "^23.9.1"
 pandas = "^2.1.0"
 tqdm = "^4.66.1"
+python-dotenv = "^1.0.0"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+target-versions = ["py311"]
+line-length = 120
+skip-string-normalization = true
