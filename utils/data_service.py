@@ -22,4 +22,4 @@ class DataSaver:
         date = datetime.datetime.now().strftime("%d_%m_%Y")
         path_to_file = cls.FRAMES_DIR / date
         cls._check_or_create_dir(path_to_file)
-        data_frame.to_csv(path_to_file / str(uuid.uuid4()), index=False)
+        data_frame.to_csv(path_to_file / f'{str(uuid.uuid4())}.csv', index=False)
