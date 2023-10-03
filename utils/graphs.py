@@ -1,14 +1,12 @@
-import os
 import matplotlib.pyplot as plt
-import pandas as pd
+
+from utils import PLOTS_DIR
+from utils.core import DataFrameMixin
 
 
-from utils import BASE_DIR
-
-
-class GraphsCreator:
+class GraphsCreator(DataFrameMixin):
     def __init__(self):
-        self._output_folder = BASE_DIR / 'plots'
+        self._output_folder = PLOTS_DIR
         self.plot_params = [
             (
                 "GENS_SIZE",
@@ -42,32 +40,16 @@ class GraphsCreator:
             ),
         ]
 
-    def get_data_frame(self):
-        all_dataframes = []
-
-        directory_path = BASE_DIR / 'frames'
-
-        for root, dirs, files in os.walk(directory_path):
-            for file in files:
-                if file.endswith('.csv'):
-                    file_path = os.path.join(root, file)
-                    dataframe = pd.read_csv(file_path)
-                    all_dataframes.append(dataframe)
-
-        final_dataframe = pd.concat(all_dataframes, ignore_index=True)
-        return final_dataframe
-
-    def create_graph(self, param, title, xlabel, name):
+    def create_graph(self, param, title, label, name):
         data_frame = self.get_data_frame()
-        grouped_data = data_frame.groupby(param)["GENERATION"].mean()
-        x_values = grouped_data.index
-        y_values = grouped_data.values
+        x_values = data_frame['GENERATION']
+        y_values = data_frame[param]
 
         plt.figure(figsize=(10, 6))
         plt.plot(x_values, y_values, marker="o", linestyle=None)
         plt.title(title)
-        plt.xlabel(xlabel)
-        plt.ylabel("generation")
+        plt.xlabel("generation")
+        plt.ylabel(label)
         plt.grid(True)
         self._save(name)
 
