@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter&family=Poppins:wght@100;400;500;600&display=swap');
+
+.font {
+    font-family: 'Poppins', sans-serif;
+}
+
+.container {
+    margin: 0 50px;
+}
+
+.graph-block {
+    margin-top: 20px;
+}
+
+.title {
+    font-size: 40px;
+    opacity: 80%;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Стиль полосы скроллбара */
+::-webkit-scrollbar-thumb {
+  background-color: rgba(21, 129, 255, 0.6);
+  border-radius: 6px;
+  height: 50px;
+}
+
+/* Стиль трека скроллбара (фон) */
+::-webkit-scrollbar-track {
+  background-color: rgba(21, 129, 255, 0.2);
+}
+
+/* Стиль скроллбара при наведении на него */
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(21, 129, 255, 0.9);
+}

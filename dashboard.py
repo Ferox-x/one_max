@@ -7,7 +7,6 @@ from dash import html
 
 from utils import RESULTS_DIR
 
-
 best_found = pd.read_csv(RESULTS_DIR / 'best_found.csv', na_values='')
 generation = pd.read_csv(RESULTS_DIR / 'generation.csv', na_values='')
 params = pd.read_csv(RESULTS_DIR / 'params.csv')
@@ -21,11 +20,6 @@ fig_best_found = px.box(
     },
 )
 
-fig_best_found.update_layout(
-    height=800,
-    width=1900,
-)
-
 fig_generation = px.box(
     data_frame=generation,
     title='График с усами (Поколения)',
@@ -33,11 +27,6 @@ fig_generation = px.box(
         'value': 'Поколения',
         'variable': 'Параметры',
     },
-)
-
-fig_generation.update_layout(
-    height=800,
-    width=1900,
 )
 
 histogram_best_found = px.histogram(
@@ -51,11 +40,6 @@ histogram_best_found = px.histogram(
     },
 )
 
-histogram_best_found.update_layout(
-    height=800,
-    width=1900,
-)
-
 histogram_generation = px.histogram(
     generation,
     title="Гистограмма распределения (Поколения)",
@@ -67,28 +51,66 @@ histogram_generation = px.histogram(
     },
 )
 
-histogram_generation.update_layout(
-    height=800,
-    width=1900,
-)
-
-app = dash.Dash(__name__)
+app = dash.Dash(__name__, suppress_callback_exceptions=True)
 
 app.layout = html.Div(
     [
-        html.H1('One Max'),
-        html.H2('Поиск параметров по коду'),
-        dcc.Input(id='search-input', type='text', placeholder='Введите код'),
+        html.H1('One Max', className="font title"),
+        html.H2('Поиск параметров по коду', className="title-graph font"),
+        dcc.Input(id='search-input', type='text', className="input-purple", placeholder='Введите код'),
         html.Div(id='search-result'),
-        html.H2('Индивида по параметрам'),
-        dcc.Input(id='search-input-individual', type='text', placeholder='Поиск лучшего по параметрам'),
-        dcc.Graph(id='individual-graph', figure=fig_best_found),
-        dcc.Input(id='search-input-generation', type='text', placeholder='Поиск поколений по параметрам'),
-        dcc.Graph(id='generation-graph', figure=fig_generation),
+        dcc.Tabs(
+            id="tabs-example-graph",
+            value='tab_1',
+            children=[
+                dcc.Tab(label='Tab One', value='tab_1'),
+                dcc.Tab(label='Tab Two', value='tab_2'),
+            ],
+        ),
+        html.Div(id='tabs-content-example-graph'),
         dcc.Graph(figure=histogram_best_found),
         dcc.Graph(figure=histogram_generation),
-    ]
+    ],
+    className="container",
 )
+
+tab_1 = html.Div(
+    [
+        html.H2('Индивида по параметрам', className="font title-graph"),
+        dcc.Input(
+            id='search-input-individual',
+            className="input-purple",
+            type='text',
+            placeholder='Поиск лучшего по параметрам',
+        ),
+        dcc.Graph(id='individual-graph', figure=fig_best_found, className="graph-size font"),
+    ],
+    className="graph-block",
+)
+
+tab_2 = html.Div(
+    [
+        dcc.Input(
+            id='search-input-generation',
+            type='text',
+            placeholder='Поиск поколений по параметрам',
+            className="input-purple",
+        ),
+        dcc.Graph(id='generation-graph', figure=fig_generation),
+    ],
+    className="graph-block",
+)
+
+
+@app.callback(
+    Output('tabs-content-example-graph', 'children'),
+    Input('tabs-example-graph', 'value'),
+)
+def render_content(tab):
+    if tab == 'tab_1':
+        return tab_1
+    elif tab == 'tab_2':
+        return tab_2
 
 
 @app.callback(
@@ -153,4 +175,6 @@ def perform_search(search_value):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(
+        debug=True,
+    )
