@@ -1,4 +1,6 @@
 import datetime
+import os
+
 import pandas as pd
 import uuid
 
@@ -26,12 +28,57 @@ class DataSaver:
 
 
 class DataAnalyzer(DataFrameMixin):
+    @classmethod
+    def get_params(cls) -> pd.DataFrame:
+        df = pd.DataFrame(columns=['Название файла', 'Номер параметров', 'Параметры'])
+        index = 0
+        for root, dirs, files in os.walk(FRAMES_DIR):
+            files = sorted(files)
+            for file in files:
+                if file.endswith('.csv'):
+                    data = pd.read_csv(os.path.join(root, file))
+                    params = data.iloc[0, :13].tolist()
+                    params = (
+                        f'ONE_MAX: {params[0]}\n'
+                        f'GENS_SIZE: {params[1]}\n'
+                        f'POPULATION_SIZE: {params[2]}\n'
+                        f'P_CROSSOVER: {params[3]}\n'
+                        f'P_MUTATION: {params[4]}\n'
+                        f'MAX_GENERATIONS: {params[5]}\n'
+                        f'TOURNAMENT_SIZE: {params[6]}\n'
+                        f'SELECTION_TYPE: {params[7]}\n'
+                        f'CROSSING_TYPE: {params[8]}\n'
+                        f'MUTATION_POWER: {params[9]}\n'
+                        f'EQUAL_SELECTION_CHANCE: {params[10]}\n'
+                        f'HIGH_MUTATION_POWER: {params[11]}\n'
+                        f'LOW_MUTATION_POWER: {params[12]}\n'
+                    )
+                    df = pd.concat(
+                        [
+                            df,
+                            pd.DataFrame(
+                                {
+                                    'Название файла': [file],
+                                    'Номер параметров': f'P{index}',
+                                    'Параметры': str(params),
+                                }
+                            ),
+                        ],
+                        ignore_index=True,
+                    )
+                    index += 1
+        df.to_csv(RESULTS_DIR / 'params.csv')
+        return df
+
     def create_best_found_csv(self) -> pd.DataFrame:
-        data_frames = self.get_data_frames()
+        params = pd.read_csv(RESULTS_DIR / 'params.csv')
         data = dict()
-        for index, data_frame in enumerate(data_frames):
+        file_names = params['Название файла']
+        params_number = params['Номер параметров']
+        for index, file_name in enumerate(file_names):
+            data_frame = pd.read_csv(self.find_file(file_name, FRAMES_DIR))
             series = data_frame['BEST_FITNESS']
-            data[f'P{index}'] = series
+            data[params_number[index]] = series
         df = pd.DataFrame(data)
         df.to_csv(RESULTS_DIR / 'best_found.csv')
         return df
@@ -59,5 +106,6 @@ class DataAnalyzer(DataFrameMixin):
 
 if __name__ == '__main__':
     analyzer = DataAnalyzer()
+    # analyzer.get_params()
     best_found = analyzer.create_best_found_csv()
-    generation = analyzer.create_generation_csv()
+    # generation = analyzer.create_generation_csv()

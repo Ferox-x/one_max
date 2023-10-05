@@ -7,6 +7,12 @@ from utils import BASE_DIR
 
 class DataFrameMixin:
     @classmethod
+    def find_file(cls, filename, search_path):
+        for root, dirs, files in os.walk(search_path):
+            if filename in files:
+                return os.path.join(root, filename)
+
+    @classmethod
     def get_data_frame(cls):
         all_dataframes = []
 
@@ -29,6 +35,7 @@ class DataFrameMixin:
         directory_path = BASE_DIR / 'frames'
 
         for root, dirs, files in os.walk(directory_path):
+            files = sorted(files)
             for file in files:
                 if file.endswith('.csv'):
                     file_path = os.path.join(root, file)
