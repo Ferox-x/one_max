@@ -67,7 +67,11 @@ class DataAnalyzer(DataFrameMixin):
                         ignore_index=True,
                     )
                     index += 1
-        df.to_csv(RESULTS_DIR / 'params.csv')
+        df.to_csv(
+            RESULTS_DIR / 'params.csv',
+            index=False,
+            index_label=False,
+        )
         return df
 
     def create_best_found_csv(self) -> pd.DataFrame:
@@ -80,17 +84,28 @@ class DataAnalyzer(DataFrameMixin):
             series = data_frame['BEST_FITNESS']
             data[params_number[index]] = series
         df = pd.DataFrame(data)
-        df.to_csv(RESULTS_DIR / 'best_found.csv')
+        df.to_csv(
+            RESULTS_DIR / 'best_found.csv',
+            index=False,
+            index_label=False,
+        )
         return df
 
     def create_generation_csv(self) -> pd.DataFrame:
-        data_frames = self.get_data_frames()
+        params = pd.read_csv(RESULTS_DIR / 'params.csv')
         data = dict()
-        for index, data_frame in enumerate(data_frames):
+        file_names = params['Название файла']
+        params_number = params['Номер параметров']
+        for index, file_name in enumerate(file_names):
+            data_frame = pd.read_csv(self.find_file(file_name, FRAMES_DIR))
             series = data_frame['GENERATION']
-            data[f'P{index}'] = series
+            data[params_number[index]] = series
         df = pd.DataFrame(data)
-        df.to_csv(RESULTS_DIR / 'generation.csv')
+        df.to_csv(
+            RESULTS_DIR / 'generation.csv',
+            index=False,
+            index_label=False,
+        )
         return df
 
     def create_max_fitness_values_csv(self) -> pd.DataFrame:
@@ -100,12 +115,14 @@ class DataAnalyzer(DataFrameMixin):
             series = data_frame['MAX_FITNESS_VALUES']
             data[f'P{index}'] = series
         df = pd.DataFrame(data)
-        df.to_csv(RESULTS_DIR / 'generation.csv')
+        df.to_csv(
+            RESULTS_DIR / 'max_fitness.csv',
+        )
         return df
 
 
 if __name__ == '__main__':
     analyzer = DataAnalyzer()
-    # analyzer.get_params()
+    analyzer.get_params()
     best_found = analyzer.create_best_found_csv()
-    # generation = analyzer.create_generation_csv()
+    generation = analyzer.create_generation_csv()
