@@ -6,9 +6,8 @@
     height: 20px;
     padding: 5px 10px;
     font-family: "Helvetica", serif;
-    margin-bottom: 50px;
+    margin-bottom: 10px;
 }
 ::placeholder + font {
     color: rgba(0, 0, 0, 0.52);
-
 }

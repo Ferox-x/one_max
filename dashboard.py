@@ -1,55 +1,18 @@
 import dash
 import pandas as pd
-import plotly.express as px
 
 from dash import dcc, Output, Input
 from dash import html
 
+from dasboard.figures import (
+    get_generation_box_plot,
+    get_fitness_box_plot,
+    get_best_fitness_histogram,
+    get_generation_histogram,
+)
 from utils import RESULTS_DIR
 
-best_found = pd.read_csv(RESULTS_DIR / 'best_found.csv', na_values='')
-generation = pd.read_csv(RESULTS_DIR / 'generation.csv', na_values='')
 params = pd.read_csv(RESULTS_DIR / 'params.csv')
-
-fig_best_found = px.box(
-    data_frame=best_found,
-    title='График с усами (Лучший потомок)',
-    labels={
-        'value': 'Best fitness',
-        'variable': 'Параметры',
-    },
-)
-
-fig_generation = px.box(
-    data_frame=generation,
-    title='График с усами (Поколения)',
-    labels={
-        'value': 'Поколения',
-        'variable': 'Параметры',
-    },
-)
-
-histogram_best_found = px.histogram(
-    best_found,
-    title="Гистограмма распределения (Лучший потомок)",
-    color_discrete_sequence=["orange"],
-    nbins=15,
-    labels={
-        'count': 'Количество',
-        'value': 'Best Fitness',
-    },
-)
-
-histogram_generation = px.histogram(
-    generation,
-    title="Гистограмма распределения (Поколения)",
-    color_discrete_sequence=["orange"],
-    nbins=15,
-    labels={
-        'count': 'Количество',
-        'value': 'Количество поколений',
-    },
-)
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 
@@ -61,56 +24,85 @@ app.layout = html.Div(
         html.Div(id='search-result'),
         dcc.Tabs(
             id="tabs-example-graph",
-            value='tab_1',
+            value='tab_fitness',
             children=[
-                dcc.Tab(label='Tab One', value='tab_1'),
-                dcc.Tab(label='Tab Two', value='tab_2'),
+                dcc.Tab(
+                    label='Ящик с усами (Лучший потомок)',
+                    value='tab_fitness',
+                    className='font',
+                ),
+                dcc.Tab(
+                    label='Ящик с усами (Поколения)',
+                    value='tab_generation',
+                    className='font',
+                ),
             ],
         ),
-        html.Div(id='tabs-content-example-graph'),
-        dcc.Graph(figure=histogram_best_found),
-        dcc.Graph(figure=histogram_generation),
+        html.Div(id='tabs-content'),
+        dcc.Graph(figure=get_best_fitness_histogram()),
+        dcc.Graph(figure=get_generation_histogram()),
     ],
     className="container",
 )
 
-tab_1 = html.Div(
-    [
-        html.H2('Индивида по параметрам', className="font title-graph"),
-        dcc.Input(
-            id='search-input-individual',
-            className="input-purple",
-            type='text',
-            placeholder='Поиск лучшего по параметрам',
-        ),
-        dcc.Graph(id='individual-graph', figure=fig_best_found, className="graph-size font"),
-    ],
-    className="graph-block",
-)
-
-tab_2 = html.Div(
-    [
-        dcc.Input(
-            id='search-input-generation',
-            type='text',
-            placeholder='Поиск поколений по параметрам',
-            className="input-purple",
-        ),
-        dcc.Graph(id='generation-graph', figure=fig_generation),
-    ],
-    className="graph-block",
-)
-
 
 @app.callback(
-    Output('tabs-content-example-graph', 'children'),
+    Output('tabs-content', 'children'),
     Input('tabs-example-graph', 'value'),
 )
 def render_content(tab):
-    if tab == 'tab_1':
-        return tab_1
-    elif tab == 'tab_2':
-        return tab_2
+    if tab == 'tab_fitness':
+        return html.Div(
+            [
+                html.H2('Поиск по набору параметров', className="font title-graph"),
+                dcc.Input(
+                    id='search-input-individual',
+                    className="input-purple",
+                    type='text',
+                    placeholder='Поиск лучшего по параметрам',
+                ),
+                dcc.Loading(
+                    children=[
+                        dcc.Graph(
+                            id='individual-graph',
+                            figure=get_fitness_box_plot(),
+                            className="graph-size font",
+                        ),
+                    ],
+                    type="circle",
+                ),
+            ],
+            className="graph-block",
+        )
+    elif tab == 'tab_generation':
+        return html.Div(
+            [
+                html.Div(
+                    [
+                        html.H2('Поиск по набору параметров', className="font title-graph"),
+                        dcc.Input(
+                            id='search-input-generation',
+                            type='text',
+                            placeholder='Поиск поколений по параметрам',
+                            className="input-purple",
+                        ),
+                        dcc.Loading(
+                            id="loading-2",
+                            children=[
+                                dcc.Graph(
+                                    id='generation-graph',
+                                    figure=get_generation_box_plot(),
+                                    className="graph-size font",
+                                ),
+                            ],
+                            type="circle",
+                        ),
+                    ],
+                    className="graph-block",
+                )
+            ],
+            className="graph-block",
+        )
 
 
 @app.callback(
@@ -119,19 +111,12 @@ def render_content(tab):
 )
 def perform_search_generation(search_value: str):
     if search_value is None:
-        return fig_generation
+        return get_generation_box_plot()
     search_value = search_value.upper()
     try:
-        return px.box(
-            data_frame=generation[search_value],
-            title='График с усами (Поколения)',
-            labels={
-                'value': 'Поколения',
-                'variable': 'Параметры',
-            },
-        )
+        return get_generation_box_plot(search_value)
     except KeyError:
-        return fig_generation
+        return get_generation_box_plot()
 
 
 @app.callback(
@@ -140,19 +125,12 @@ def perform_search_generation(search_value: str):
 )
 def perform_search_individual(search_value: str):
     if search_value is None:
-        return fig_best_found
+        return get_fitness_box_plot()
     search_value = search_value.upper()
     try:
-        return px.box(
-            data_frame=best_found[search_value],
-            title='График с усами (Лучший потомок)',
-            labels={
-                'value': 'Best fitness',
-                'variable': 'Параметры',
-            },
-        )
+        return get_fitness_box_plot(search_value)
     except KeyError:
-        return fig_best_found
+        return get_fitness_box_plot()
 
 
 @app.callback(
