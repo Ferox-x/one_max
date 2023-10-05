@@ -77,12 +77,14 @@ app = dash.Dash(__name__)
 app.layout = html.Div(
     [
         html.H1('One Max'),
-        html.H2('Поиск по параметрам'),
-        dcc.Input(id='search-input', type='text', placeholder='Введите значение параметров'),
-        html.Button('Поиск', id='search-button'),
+        html.H2('Поиск параметров по коду'),
+        dcc.Input(id='search-input', type='text', placeholder='Введите код'),
         html.Div(id='search-result'),
-        dcc.Graph(figure=fig_best_found),
-        dcc.Graph(figure=fig_generation),
+        html.H2('Индивида по параметрам'),
+        dcc.Input(id='search-input-individual', type='text', placeholder='Поиск лучшего по параметрам'),
+        dcc.Graph(id='individual-graph', figure=fig_best_found),
+        dcc.Input(id='search-input-generation', type='text', placeholder='Поиск поколений по параметрам'),
+        dcc.Graph(id='generation-graph', figure=fig_generation),
         dcc.Graph(figure=histogram_best_found),
         dcc.Graph(figure=histogram_generation),
     ]
@@ -90,11 +92,52 @@ app.layout = html.Div(
 
 
 @app.callback(
-    Output('search-result', 'children'),
-    Input('search-button', 'n_clicks'),
-    [Input('search-input', 'value')],
+    Output('generation-graph', 'figure'),
+    Input('search-input-generation', 'value'),
 )
-def perform_search(n_clicks, search_value):
+def perform_search_generation(search_value: str):
+    if search_value is None:
+        return fig_generation
+    search_value = search_value.upper()
+    try:
+        return px.box(
+            data_frame=generation[search_value],
+            title='График с усами (Поколения)',
+            labels={
+                'value': 'Поколения',
+                'variable': 'Параметры',
+            },
+        )
+    except KeyError:
+        return fig_generation
+
+
+@app.callback(
+    Output('individual-graph', 'figure'),
+    Input('search-input-individual', 'value'),
+)
+def perform_search_individual(search_value: str):
+    if search_value is None:
+        return fig_best_found
+    search_value = search_value.upper()
+    try:
+        return px.box(
+            data_frame=best_found[search_value],
+            title='График с усами (Лучший потомок)',
+            labels={
+                'value': 'Best fitness',
+                'variable': 'Параметры',
+            },
+        )
+    except KeyError:
+        return fig_best_found
+
+
+@app.callback(
+    Output('search-result', 'children'),
+    Input('search-input', 'value'),
+)
+def perform_search(search_value):
     if search_value is None:
         return ""
 
