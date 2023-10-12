@@ -13,6 +13,13 @@ class PopulationInterface(list):
 
 
 class SelectionMixin(PopulationInterface):
+    selection_type_display = {
+        1: 'Турнир',
+        2: 'Пропорциональный',
+        3: 'Линейный',
+        4: 'Экспоненциальный',
+    }
+
     class SelectionTypeChoice(Enum):
         TOURNAMENT = 1
         PROPORTIONAL = 2
@@ -29,24 +36,17 @@ class SelectionMixin(PopulationInterface):
         if self.constants.SELECTION_TYPE == self.SelectionTypeChoice.EXPONENTIAL.value:
             return self.exponential_selection()
         else:
-            raise NotImplementedError(
-                f"Передан неопределённый тип отбора: {self.constants.SELECTION_TYPE}"
-            )
+            raise NotImplementedError(f"Передан неопределённый тип отбора: {self.constants.SELECTION_TYPE}")
 
     def linear_selection(self):
         sorted_population = sorted(self, key=lambda x: x.fitness, reverse=True)
         total_rank = len(self)
 
         probabilities = np.array(
-            [
-                (2.0 - (2.0 * (i - 1) / (total_rank - 1))) / total_rank
-                for i in range(1, total_rank + 1)
-            ]
+            [(2.0 - (2.0 * (i - 1) / (total_rank - 1))) / total_rank for i in range(1, total_rank + 1)]
         )
 
-        selected_parents_indices = np.random.choice(
-            total_rank, total_rank, p=probabilities
-        )
+        selected_parents_indices = np.random.choice(total_rank, total_rank, p=probabilities)
         offspring = self._create_population_with_constants()
         selected_parents = [sorted_population[i] for i in selected_parents_indices]
         offspring.extend(selected_parents)
@@ -60,19 +60,12 @@ class SelectionMixin(PopulationInterface):
         probabilities = np.array(
             [
                 ((2 - selection_pressure) / total_rank)
-                + (
-                    2
-                    * (i - 1)
-                    * (selection_pressure - 1)
-                    / ((total_rank - 1) * (total_rank))
-                )
+                + (2 * (i - 1) * (selection_pressure - 1) / ((total_rank - 1) * (total_rank)))
                 for i in range(1, total_rank + 1)
             ]
         )
 
-        selected_parents_indices = np.random.choice(
-            total_rank, total_rank, p=probabilities
-        )
+        selected_parents_indices = np.random.choice(total_rank, total_rank, p=probabilities)
         offspring = self._create_population_with_constants()
         selected_parents = [sorted_population[i] for i in selected_parents_indices]
         offspring.extend(selected_parents)
@@ -84,12 +77,8 @@ class SelectionMixin(PopulationInterface):
         tournament_size = self.constants.TOURNAMENT_SIZE
 
         for _ in range(population_len):
-            members = np.random.choice(
-                range(population_len), tournament_size, replace=False
-            )
-            best_individual = max(
-                [self[_] for _ in members], key=lambda ind: ind.fitness
-            )
+            members = np.random.choice(range(population_len), tournament_size, replace=False)
+            best_individual = max([self[_] for _ in members], key=lambda ind: ind.fitness)
             offspring.append(best_individual.clone())
 
         return offspring
@@ -100,9 +89,7 @@ class SelectionMixin(PopulationInterface):
         individual_chances = np.arange(len(self))
 
         for _ in range(population_len):
-            roulette_circle = np.repeat(
-                individual_chances, [ind.fitness for ind in self]
-            )
+            roulette_circle = np.repeat(individual_chances, [ind.fitness for ind in self])
             individual_index = np.random.choice(roulette_circle)
             offspring.append(self[individual_index])
 
@@ -110,6 +97,12 @@ class SelectionMixin(PopulationInterface):
 
 
 class CrossingMixin(PopulationInterface):
+    crossing_type_display = {
+        1: 'Одно-точечное',
+        2: 'Дву-точечное',
+        3: 'Равномерное',
+    }
+
     class CrossingTypeChoice(Enum):
         ONE_POINT = 1
         TWO_POINT = 2
@@ -118,24 +111,14 @@ class CrossingMixin(PopulationInterface):
     def crossing(self):
         for child1, child2 in zip(self[::2], self[1::2]):
             if np.random.random() < self.constants.P_CROSSOVER:
-                if (
-                    self.constants.CROSSING_TYPE
-                    == self.CrossingTypeChoice.ONE_POINT.value
-                ):
+                if self.constants.CROSSING_TYPE == self.CrossingTypeChoice.ONE_POINT.value:
                     self._one_point_crossing(child1, child2)
-                elif (
-                    self.constants.CROSSING_TYPE
-                    == self.CrossingTypeChoice.TWO_POINT.value
-                ):
+                elif self.constants.CROSSING_TYPE == self.CrossingTypeChoice.TWO_POINT.value:
                     self._two_point_crossing(child1, child2)
-                elif (
-                    self.constants.CROSSING_TYPE == self.CrossingTypeChoice.EQUAL.value
-                ):
+                elif self.constants.CROSSING_TYPE == self.CrossingTypeChoice.EQUAL.value:
                     self._equal_crossing(child1, child2)
                 else:
-                    raise NotImplementedError(
-                        f"Передан неопределённый тип скрещивания: {self.constants.CROSSING_TYPE}"
-                    )
+                    raise NotImplementedError(f"Передан неопределённый тип скрещивания: {self.constants.CROSSING_TYPE}")
 
     @staticmethod
     def _one_point_crossing(child_1, child_2):
@@ -177,19 +160,13 @@ class MutationMixin(PopulationInterface):
 
     def _flip_bit(self, mutant):
         if self.constants.MUTATION_POWER == self.PowerOfMutationChoices.LOW.value:
-            chance_per_gen = (
-                1 / self.constants.GENS_SIZE * self.constants.LOW_MUTATION_POWER
-            )
+            chance_per_gen = 1 / self.constants.GENS_SIZE * self.constants.LOW_MUTATION_POWER
         elif self.constants.MUTATION_POWER == self.PowerOfMutationChoices.DEFAULT.value:
             chance_per_gen = 1 / self.constants.GENS_SIZE
         elif self.constants.MUTATION_POWER == self.PowerOfMutationChoices.HIGH.value:
-            chance_per_gen = (
-                1 * self.constants.HIGH_MUTATION_POWER / self.constants.GENS_SIZE
-            )
+            chance_per_gen = 1 * self.constants.HIGH_MUTATION_POWER / self.constants.GENS_SIZE
         else:
-            raise NotImplementedError(
-                f"Передан неопределённый тип силы мутации: {self.constants.MUTATION_POWER}"
-            )
+            raise NotImplementedError(f"Передан неопределённый тип силы мутации: {self.constants.MUTATION_POWER}")
 
         for index, gen in enumerate(mutant.gens):
             if np.random.random() < chance_per_gen:

@@ -33,7 +33,7 @@ def get_generation_histogram():
     )
 
 
-def get_fitness_box_plot(name: str = None):
+def get_fitness_box_plot(name: str = None, generations: float = None):
     if name:
         return px.box(
             data_frame=best_found[name],
@@ -43,7 +43,8 @@ def get_fitness_box_plot(name: str = None):
                 'variable': 'Параметры',
             },
         )
-    return px.box(
+
+    box_plot = px.box(
         data_frame=best_found,
         title='График с усами (Лучший потомок)',
         labels={
@@ -51,6 +52,29 @@ def get_fitness_box_plot(name: str = None):
             'variable': 'Параметры',
         },
     )
+
+    return box_plot
+
+
+#
+# def get_fitness_box_plot(name: str = None):
+#     if name:
+#         return px.box(
+#             data_frame=best_found[name],
+#             title='График с усами (Лучший потомок)',
+#             labels={
+#                 'value': 'Best fitness',
+#                 'variable': 'Параметры',
+#             },
+#         )
+#     return px.box(
+#         data_frame=best_found,
+#         title='График с усами (Лучший потомок)',
+#         labels={
+#             'value': 'Best fitness',
+#             'variable': 'Параметры',
+#         },
+#     )
 
 
 def get_generation_box_plot(name: str = None):

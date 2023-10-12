@@ -6,7 +6,7 @@ import uuid
 
 from pathlib import Path
 
-
+from population.mixins import SelectionMixin, CrossingMixin
 from utils import FRAMES_DIR, RESULTS_DIR
 from utils.core import DataFrameMixin
 
@@ -39,19 +39,19 @@ class DataAnalyzer(DataFrameMixin):
                     data = pd.read_csv(os.path.join(root, file))
                     params = data.iloc[0, :13].tolist()
                     params = (
-                        f'ONE_MAX: {params[0]}\n'
-                        f'GENS_SIZE: {params[1]}\n'
-                        f'POPULATION_SIZE: {params[2]}\n'
-                        f'P_CROSSOVER: {params[3]}\n'
-                        f'P_MUTATION: {params[4]}\n'
-                        f'MAX_GENERATIONS: {params[5]}\n'
-                        f'TOURNAMENT_SIZE: {params[6]}\n'
-                        f'SELECTION_TYPE: {params[7]}\n'
-                        f'CROSSING_TYPE: {params[8]}\n'
-                        f'MUTATION_POWER: {params[9]}\n'
-                        f'EQUAL_SELECTION_CHANCE: {params[10]}\n'
-                        f'HIGH_MUTATION_POWER: {params[11]}\n'
-                        f'LOW_MUTATION_POWER: {params[12]}\n'
+                        f'One Max: {params[0]}\n'
+                        f'Количество генов: {params[1]}\n'
+                        f'Размер популяции: {params[2]}\n'
+                        f'Вероятность скрещивания: {params[3]}\n'
+                        f'Вероятность мутации: {params[4]}\n'
+                        f'Максимальное кол-во поколений: {params[5]}\n'
+                        f'Размер турнира: {params[6]}\n'
+                        f'Механизм отбора: {SelectionMixin.selection_type_display[int(params[7])]} {params[7]}\n'
+                        f'Механизм скрещивания: {CrossingMixin.crossing_type_display[int(params[8])]} {params[8]}\n'
+                        f'Сила мутации: {params[9]}\n'
+                        f'Вероятность пропорционального скрещивания: {params[10]}\n'
+                        f'Сила мощной мутации: {params[11]}\n'
+                        f'Сила слабой мутации: {params[12]}\n'
                     )
                     df = pd.concat(
                         [

@@ -37,3 +37,13 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(21, 129, 255, 0.9);
 }
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.p-default  {
+    margin: 0;
+    padding: 0;
+}
